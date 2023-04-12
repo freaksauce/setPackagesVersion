@@ -1,7 +1,6 @@
 const fs = require('fs')
 const path = require('path')
 const { spawn } = require('node:child_process')
-const rimraf = require('rimraf')
 
 function installDependencies() {
   const child = spawn('npm', ['install'], { stdio: 'inherit' })
@@ -23,18 +22,15 @@ function deleteLockFiles() {
 }
 
 function deleteDirectory(directory) {
-  rimraf(directory, (err) => {
-    if (err) throw err
-    console.log(`${directory} deleted`)
-  })
+  fs.rmdir(directory, { recursive: true }, () => console.log(`${directory} deleted`))
 }
 
-function updatePackages(packageJson, pattern, version) {
+function updatePackages(packageJson, pattern, version, modifier) {
   const dependencies = packageJson.dependencies
 
   for (let packageName in dependencies) {
     if (packageName.startsWith(pattern)) {
-      dependencies[packageName] = version
+      dependencies[packageName] = modifier + version
     }
   }
 
@@ -46,7 +42,7 @@ function getPkgDir(str) {
   return index === -1 ? str : str.substring(0, index)
 }
 
-function setPackagesVersion(pattern, version) {
+function setPackagesVersion(pattern, version, modifier = null) {
   const dir = getPkgDir(pattern)
   const filePath = path.resolve(__dirname, 'package.json')
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -56,7 +52,7 @@ function setPackagesVersion(pattern, version) {
     }
 
     const packageJson = JSON.parse(data)
-    updatePackages(packageJson, pattern, version)
+    updatePackages(packageJson, pattern, version, modifier)
     fs.writeFile(filePath, JSON.stringify(packageJson, null, 2), 'utf8', (err) => {
       if (err) {
         console.error(err)
@@ -73,4 +69,4 @@ function setPackagesVersion(pattern, version) {
   })
 }
 
-setPackagesVersion('@iag/chroma-react-ui', '1.0.0')
+setPackagesVersion('@iag/chroma-react-ui', '1.0.0', '~')
