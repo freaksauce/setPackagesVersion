@@ -1,0 +1,36 @@
+{
+  "name": "set-packages-version",
+  "version": "0.1.0",
+  "dependencies": {
+    "@iag/chroma-react-ui-utils.brand-provider": "1.2.3",
+    "@iag/chroma-react-ui.accordion": "1.2.3",
+    "@iag/chroma-react-ui.alert": "1.2.3",
+    "@iag/chroma-react-ui.autocomplete": "1.2.3",
+    "autoprefixer": "^10.4.13",
+    "tailwindcss": "^3.2.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
