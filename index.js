@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { spawn } = require('node:child_process')
+const rimraf = require('rimraf')
 
 function installDependencies() {
   const child = spawn('npm', ['install'], { stdio: 'inherit' })
@@ -21,6 +22,13 @@ function deleteLockFiles() {
   }
 }
 
+function deleteDirectory(directory) {
+  rimraf(directory, (err) => {
+    if (err) throw err
+    console.log(`${directory} deleted`)
+  })
+}
+
 function updatePackages(packageJson, pattern, version) {
   const dependencies = packageJson.dependencies
 
@@ -33,7 +41,13 @@ function updatePackages(packageJson, pattern, version) {
   return packageJson
 }
 
+function getPkgDir(str) {
+  const index = str.indexOf('/')
+  return index === -1 ? str : str.substring(0, index)
+}
+
 function setPackagesVersion(pattern, version) {
+  const dir = getPkgDir(pattern)
   const filePath = path.resolve(__dirname, 'package.json')
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
@@ -48,11 +62,15 @@ function setPackagesVersion(pattern, version) {
         console.error(err)
         return
       }
-      deleteLockFiles()
       console.log(`Chroma Bit Packages updated to v${version}`)
+      deleteLockFiles()
+      console.log(`Lock files deleted`)
+      deleteDirectory(`./node_modules/${dir}`)
+      console.log(`${dir} dir deleted`)
       installDependencies()
+      console.log(`dependencies installed`)
     })
   })
 }
 
-setPackagesVersion('@iag/chroma-react-ui', '1.0.1')
+setPackagesVersion('@iag/chroma-react-ui', '1.0.0')
