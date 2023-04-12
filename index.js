@@ -69,4 +69,4 @@ function setPackagesVersion(pattern, version, modifier = null) {
   })
 }
 
-setPackagesVersion('@iag/chroma-react-ui', '1.0.0', '~')
+setPackagesVersion('@iag/chroma-react-ui', '1.0.0', '^')
