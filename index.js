@@ -42,7 +42,7 @@ function setPackagesVersion(pattern, version) {
     }
 
     const packageJson = JSON.parse(data)
-    updatePackages(packageJson, pattern, '5.0.0')
+    updatePackages(packageJson, pattern, version)
     fs.writeFile(filePath, JSON.stringify(packageJson, null, 2), 'utf8', (err) => {
       if (err) {
         console.error(err)
@@ -55,4 +55,4 @@ function setPackagesVersion(pattern, version) {
   })
 }
 
-setPackagesVersion('@iag/chroma-react-ui', '5.0.0')
+setPackagesVersion('@iag/chroma-react-ui', '1.0.1')
