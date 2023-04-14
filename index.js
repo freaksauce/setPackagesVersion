@@ -42,25 +42,30 @@ function getPkgDir(str) {
   return index === -1 ? str : str.substring(0, index)
 }
 
-function updateBrandProviderVersion(version) {
-  const tagName = 'BrandProvider'
-  const repoPath = './src'
-  const fileExtension = '.js' // assuming React components are written in JavaScript files
-  const tagRegex = new RegExp(`<${tagName}.*?version="(.*?)"`, 'g')
-
-  fs.readdirSync(repoPath).forEach((file) => {
-    const filePath = path.join(repoPath, file)
-    if (fs.statSync(filePath).isDirectory()) {
-      updateBrandProviderVersion(tagName, version, filePath) // recursively search subdirectories
-    } else if (path.extname(file) === fileExtension) {
-      let contents = fs.readFileSync(filePath, 'utf8')
-      contents = contents.replace(tagRegex, `<${tagName} version="${version}"`)
-      fs.writeFileSync(filePath, contents, 'utf8')
-    }
-  })
+function updateFile(tagName, version, filePath, tagRegex) {
+  let contents = fs.readFileSync(filePath, 'utf8')
+  contents = contents.replace(tagRegex, `<${tagName} version="${version}"`)
+  fs.writeFileSync(filePath, contents, 'utf8')
 }
 
-function setPackagesVersion(pattern, version, modifier = null) {
+function updateBrandProviderVersion(version, BrandProviderSearchPath = './src') {
+  const tagName = 'BrandProvider'
+  const tagRegex = new RegExp(`<${tagName}.*?version="(.*?)"`, 'g')
+  if (fs.statSync(BrandProviderSearchPath).isFile()) {
+    updateFile(tagName, version, BrandProviderSearchPath, tagRegex)
+  } else {
+    fs.readdirSync(BrandProviderSearchPath).forEach((file) => {
+      const filePath = path.join(BrandProviderSearchPath, file)
+      if (fs.statSync(filePath).isDirectory()) {
+        updateBrandProviderVersion(tagName, version, filePath) // recursively search subdirectories
+      } else {
+        updateFile(tagName, version, filePath, tagRegex)
+      }
+    })
+  }
+}
+
+function setPackagesVersion(pattern, version, modifier = null, BrandProviderSearchPath) {
   const dir = getPkgDir(pattern)
   const filePath = path.resolve(__dirname, 'package.json')
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -82,11 +87,11 @@ function setPackagesVersion(pattern, version, modifier = null) {
       deleteDirectory(`./node_modules/${dir}`)
       console.log(`${dir} dir deleted`)
       installDependencies()
-      console.log(`dependencies installed`)
-      updateBrandProviderVersion(version)
+      console.log(`dependencies installing...`)
+      updateBrandProviderVersion(version, BrandProviderSearchPath)
       console.log('BrandProvider version updated')
     })
   })
 }
 
-setPackagesVersion('@iag/chroma-react-ui', '1.0.1', '^')
+setPackagesVersion('@iag/chroma-react-ui', '1.0.1', '^', './src/App.js')
